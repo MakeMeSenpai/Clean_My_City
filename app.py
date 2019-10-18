@@ -223,4 +223,3 @@ run() #runs our program
     # 5. Make events better preforming and donation option available - revert to 3 
     # 6. Ship app to every app store
     # 7. re-examine and clean up site/app based off user feedback
-    
