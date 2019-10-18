@@ -47,10 +47,10 @@ class Ticket():
                 self.img_counter += 1 # helps name imgs
                 rval = False
 
+        vc.release() # stops capturing images
+        cv2.destroyWindow(self.ticket_name) # destroys cv2 window
         self.ticket_name = input("Name of Ticket: ")
         self.description = input("Location and Description: ")
-        vc.release() # stops capturing images
-        cv2.destroyWindow("") # destroys cv2 window
 
         #access cancle method to determine if user wants to save or not
         while True:
