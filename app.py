@@ -63,8 +63,10 @@ class Ticket():
 
     # Read a ticket (the ability to view a ticket)
     def read(self):
-        # cv2.imshow(self.ticket_name)
-        # cv2.imread(self.img_name)
+        img = cv2.imread(self.img_name) #Read Image
+        cv2.imshow(self.ticket_name,img) #Display Image
+        cv2.waitKey(1000)
+        cv2.destroyAllWindows() #doesn't close due to cv2 bug
         print(self.ticket_name)
         print(self.description)
 
