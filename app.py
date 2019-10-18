@@ -1,62 +1,108 @@
-#Camera controls! Thanks Ryan Keys for the help and Stack Overflow
 from cv2 import cv2
 
-cv2.namedWindow("Hello")
-vc = cv2.VideoCapture(0)
-
-if vc.isOpened(): # try to get the first frame
-    rval, frame = vc.read()
-else:
-    rval = False
-
-while rval:
-    cv2.imshow("Hello", frame)
-    rval, frame = vc.read()
-    frame = cv2.flip(frame,1)
-    key = cv2.waitKey(20)
-    if key == 27: # exit on ESC
-        break
-vc.release()
-cv2.destroyWindow("Hello")
-
-#TODO: Skateboard- Users are able to create, edit, and delete tickets (CRUD)
     
-# Class for tickets
-class Ticket():
-    def __init__(self):
-        pass
-
-    # Creates a ticket
-    def create(self):
-        pass
-
-    # Read a ticket (the ability to view a ticket)
-    def read(self):
-        pass
-
-    # lets user edit a ticket
-    def edit(self):
-        pass
-
-    # lets user update a ticket
-    def update(self):
-        pass
-
-    # let the user delete a ticket
-    def delete(self):
-        pass
-
-    # cancles the creation of a ticket
-    def cancle(self):
-        pass
-
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
-    # 1. Create a way for the user to be able to use their camera - edit camera code
+    # 1. Create a way for the user to be able to use their camera
     # 2. Create templates for html- base.html etc
     # 3. Create routes for different pages- @route home, polution page, cleaned page
     # 4. Create a way for users to leave comments on tickets-class comment
     # 5. Create a cleaner UI on all of your pages
+
+# Class for tickets
+class Ticket():
+    def __init__(self):
+        self.ticket_name = ""
+        self.description = ""
+
+    # Creates a ticket
+    def create(self):
+        self.ticket_name = input("Name of Ticket: ")
+        self.description = input("Location and Description: ")
+        #access cancle method to determine if user wants to save or not
+        while True:
+            save = input("Would you like to save?(y/n): ")
+            if save == 'y':
+                return False
+            elif save == 'n':
+                self.cancle()
+                return False
+
+    # Read a ticket (the ability to view a ticket)
+    def read(self):
+        print(self.ticket_name)
+        print(self.description)
+
+    # lets user edit a ticket
+    def edit(self):
+        self.ticket_name = input("Rename Ticket: ")
+        self.description = input("New Description: ")
+
+    # lets user update a ticket
+    def update(self):
+        self.ticket_name += " *Cleaned!*"
+        self.description += input("Clean up description: ")
+
+    # let the user delete a ticket
+    def delete(self):
+        self.ticket_name = ""
+        self.description = ""
+
+    # cancles the creation of a ticket
+    def cancle(self):
+        self.ticket_name = ""
+        self.description = ""
+        print("No problem. Nothing was saved!")
+
+# Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
+def run():
+    cv2.namedWindow("") # names our camera window
+    vc = cv2.VideoCapture(0) #looks at first frame 
+    img_counter = 0 # helps name our imgs
+
+    #detects if the camera is on or not
+    if vc.isOpened(): 
+        rval, frame = vc.read()  # Shows camera feed
+    else:
+        rval = False
+
+    while rval: # keeps camera on
+        cv2.imshow("", frame) # shows camera feed
+        rval, frame = vc.read() # shows camera feed
+        frame = cv2.flip(frame,1) # inverts camera
+        key = cv2.waitKey(20) # sets keyboard commands later, but here it waits 20ms for each frame
+        if key == 27: # exit on ESC - this is an emergancy exit
+            break 
+        elif key%256 == 32: # SPACE pressed - takes a picture!
+            img_name = "pics/ticket_{}.png".format(img_counter) # writes file name, in pics path
+            cv2.imread(img_name,1) # shows us tour picture *sometimes late*
+            cv2.imwrite(img_name, frame) # creates img file
+            print("{} written!".format(img_name)) #terminal output to help us
+            img_counter += 1 # helps name imgs
+            new_ticket = Ticket() # creates new ticket object
+            Ticket.create(new_ticket) # lets user create a ticket!
+            Ticket.read(new_ticket) # lets user see ticket
+            #Gives user other controls involving CRUD
+            while True: 
+                opt = input("What would you like to do?(type c, r, e, u, d, or q): ")
+                if opt == 'c':
+                    Ticket.create(new_ticket)
+                elif opt == 'r':
+                    Ticket.read(new_ticket)
+                elif opt == 'e':
+                    Ticket.edit(new_ticket)
+                elif opt == 'u':
+                    Ticket.update(new_ticket)
+                elif opt == 'd':
+                    Ticket.delete(new_ticket)
+                elif opt == 'q':
+                    return False
+                else:
+                    print("Sorry, What was that?")
+            vc.release() # stops capturing images
+            cv2.destroyWindow("") # destroys cv2 window
+run() #runs our program
+
 class Comment(object):
     def __init__(self):
         pass
