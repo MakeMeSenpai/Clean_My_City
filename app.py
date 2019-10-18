@@ -1,5 +1,10 @@
 from cv2 import cv2
-    
+from flask import Flask, render_template, request, redirect, url_for
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import os
+
+app = Flask(__name__)
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
     # 1. Create a way for the user to be able to use their camera
@@ -13,11 +18,40 @@ class Ticket():
     def __init__(self):
         self.ticket_name = ""
         self.description = ""
+        self.img_name = ""
+        self.img_counter = 0 # helps name our imgs
 
     # Creates a ticket
     def create(self):
+        cv2.namedWindow(self.ticket_name) # names our camera window
+        vc = cv2.VideoCapture(0) #looks at first frame 
+
+        #detects if the camera is on or not
+        if vc.isOpened(): 
+            rval, frame = vc.read()  # Shows camera feed
+        else:
+            rval = False
+
+        while rval: # keeps camera on
+            cv2.imshow(self.ticket_name, frame) # shows camera feed
+            rval, frame = vc.read() # shows camera feed
+            frame = cv2.flip(frame,1) # inverts camera
+            key = cv2.waitKey(20) # sets keyboard commands later, but here it waits 20ms for each frame
+            if key == 27: # exit on ESC - this is an emergancy exit
+                break 
+            elif key%256 == 32: # SPACE pressed - takes a picture!
+                self.img_name = "pics/ticket_{}.png".format(self.img_counter) # writes file name, in pics path
+                cv2.imread(self.img_name,1) # shows us tour picture *sometimes late*
+                cv2.imwrite(self.img_name, frame) # creates img file
+                print("{} written!".format(self.img_name)) #terminal output to help us
+                self.img_counter += 1 # helps name imgs
+                rval = False
+
         self.ticket_name = input("Name of Ticket: ")
         self.description = input("Location and Description: ")
+        vc.release() # stops capturing images
+        cv2.destroyWindow("") # destroys cv2 window
+
         #access cancle method to determine if user wants to save or not
         while True:
             save = input("Would you like to save?(y/n): ")
@@ -29,6 +63,8 @@ class Ticket():
 
     # Read a ticket (the ability to view a ticket)
     def read(self):
+        # cv2.imshow(self.ticket_name)
+        # cv2.imread(self.img_name)
         print(self.ticket_name)
         print(self.description)
 
@@ -56,51 +92,26 @@ class Ticket():
 
 # Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
 def run():
-    cv2.namedWindow("") # names our camera window
-    vc = cv2.VideoCapture(0) #looks at first frame 
-    img_counter = 0 # helps name our imgs
-
-    #detects if the camera is on or not
-    if vc.isOpened(): 
-        rval, frame = vc.read()  # Shows camera feed
-    else:
-        rval = False
-
-    while rval: # keeps camera on
-        cv2.imshow("", frame) # shows camera feed
-        rval, frame = vc.read() # shows camera feed
-        frame = cv2.flip(frame,1) # inverts camera
-        key = cv2.waitKey(20) # sets keyboard commands later, but here it waits 20ms for each frame
-        if key == 27: # exit on ESC - this is an emergancy exit
-            break 
-        elif key%256 == 32: # SPACE pressed - takes a picture!
-            img_name = "pics/ticket_{}.png".format(img_counter) # writes file name, in pics path
-            cv2.imread(img_name,1) # shows us tour picture *sometimes late*
-            cv2.imwrite(img_name, frame) # creates img file
-            print("{} written!".format(img_name)) #terminal output to help us
-            img_counter += 1 # helps name imgs
-            new_ticket = Ticket() # creates new ticket object
-            Ticket.create(new_ticket) # lets user create a ticket!
-            Ticket.read(new_ticket) # lets user see ticket
-            #Gives user other controls involving CRUD
-            while True: 
-                opt = input("What would you like to do?(type c, r, e, u, d, or q): ")
-                if opt == 'c':
-                    Ticket.create(new_ticket)
-                elif opt == 'r':
-                    Ticket.read(new_ticket)
-                elif opt == 'e':
-                    Ticket.edit(new_ticket)
-                elif opt == 'u':
-                    Ticket.update(new_ticket)
-                elif opt == 'd':
-                    Ticket.delete(new_ticket)
-                elif opt == 'q':
-                    return False
-                else:
-                    print("Sorry, What was that?")
-            vc.release() # stops capturing images
-            cv2.destroyWindow("") # destroys cv2 window
+    new_ticket = Ticket() # creates new ticket object
+    Ticket.create(new_ticket) # lets user create a ticket!
+    #Gives user other controls involving CRUD
+    while True: 
+        opt = input("What would you like to do?(type c, r, e, u, d, or q): ")
+        if opt == 'c':
+            Ticket.create(new_ticket)
+        elif opt == 'r':
+            Ticket.read(new_ticket)
+        elif opt == 'e':
+            Ticket.edit(new_ticket)
+        elif opt == 'u':
+            Ticket.update(new_ticket)
+        elif opt == 'd':
+            Ticket.delete(new_ticket)
+        elif opt == 'q':
+            return False
+        else:
+            print("Sorry, What was that?")
+            
 run() #runs our program
 
 class Comment(object):
