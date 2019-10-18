@@ -40,6 +40,7 @@ class Ticket():
     # lets user update a ticket
     def update(self):
         self.ticket_name += " *Cleaned!*"
+        self.description += " *Post Description*"
         self.description += input("Clean up description: ")
 
     # let the user delete a ticket
