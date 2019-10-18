@@ -10,12 +10,12 @@ app = Flask(__name__)
 # Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
-    # 2. Create templates for html- base.html etc
     # 3. Create routes for different pages- @route home, polution page, cleaned page
     # 4. Create a way for users to leave comments on tickets-class comment
     # 5. Create a cleaner UI on all of your pages
 
 # Class for tickets
+@app.route('/home') # uselessly runs flask after quiting terminal commands! 
 class Ticket():
     def __init__(self):
         self.ticket_name = ""
@@ -25,6 +25,7 @@ class Ticket():
         self.img_counter = 0 # helps name our imgs
 
     # Creates a ticket
+    @app.route('/polution')
     def create(self):
         cv2.namedWindow(self.ticket_name) # names our camera window
         vc = cv2.VideoCapture(0) #looks at first frame 
@@ -64,21 +65,8 @@ class Ticket():
                 self.cancle()
                 return False
 
-    # Read a ticket (the ability to view a ticket)
-    def read(self):
-        img = cv2.imread(self.img_name) #Read Image
-        cv2.imshow(self.ticket_name,img) #Display Image
-        cv2.waitKey(5000)
-        cv2.destroyWindow(self.ticket_name)
-        print(self.ticket_name)
-        print(self.description)
-
-    # lets user edit a ticket
-    def edit(self):
-        self.ticket_name = input("Rename Ticket: ")
-        self.description = input("New Description: ")
-
     # lets user update a ticket
+    @app.route('/cleaned')
     def update(self):
         #creates new image
         cv2.namedWindow(self.ticket_name) # names our camera window
@@ -127,6 +115,21 @@ class Ticket():
         self.description += " *Post Description*"
         self.description += input("Clean up description: ")
 
+    # Read a ticket (the ability to view a ticket)
+    def read(self):
+        img = cv2.imread(self.img_name) #Read Image
+        cv2.imshow(self.ticket_name,img) #Display Image
+        cv2.waitKey(5000)
+        cv2.destroyWindow(self.ticket_name)
+        print(self.ticket_name)
+        print(self.description)
+
+    # lets user edit a ticket
+    def edit(self):
+        self.ticket_name = input("Rename Ticket: ")
+        self.description = input("New Description: ")
+
+
     # let the user delete a ticket
     def delete(self):
         self.img_name = ""
@@ -143,6 +146,7 @@ class Ticket():
         self.description = ""
         print("No problem. Nothing was saved!")
 
+@app.route('/')
 def run():
     new_ticket = Ticket() # creates new ticket object
     Ticket.create(new_ticket) # lets user create a ticket!
