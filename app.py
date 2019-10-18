@@ -16,7 +16,7 @@ app = Flask(__name__)
     
 
 # Class for tickets
-@app.route('/home') # uselessly runs flask after quiting terminal commands! 
+@app.route('/home') # uselessly runs flask after quiting terminal commands! :3 
 class Ticket():
     def __init__(self):
         self.ticket_name = ""
@@ -102,7 +102,7 @@ class Ticket():
         before = cv2.imread(self.img_name) #opens images
         after = cv2.imread(self.new_img)
 
-        #thx https://www.tutorialkart.com/opencv/python/opencv-python-resize-image/ for the help
+        #breaks code, meant to resize images
         # before = cv2.resize(self.img_name,None,fx=0.5,fy=0.95) #resizes imgs 
         # after = cv2.resize(self.new_img,None,fx=0.5,fy=0.95)
 
@@ -114,8 +114,8 @@ class Ticket():
         cv2.destroyWindow(self.ticket_name)
 
         #makes final changes
-        self.ticket_name += " *Cleaned!*"
-        self.description += " *Post Description*"
+        self.ticket_name += " *Cleaned!* "
+        self.description += " *Post Description* "
         self.description += input("Clean up description: ")
 
     # Read a ticket (the ability to view a ticket)
