@@ -7,9 +7,9 @@ from flask import Flask, render_template, request, redirect, url_for
 
 
 app = Flask(__name__)
+# Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
-    # 1. Create a way for the user to be able to use their camera
     # 2. Create templates for html- base.html etc
     # 3. Create routes for different pages- @route home, polution page, cleaned page
     # 4. Create a way for users to leave comments on tickets-class comment
@@ -102,7 +102,6 @@ class Ticket():
                 cv2.imread(self.new_img,1) # shows us tour picture *sometimes late*
                 cv2.imwrite(self.new_img, frame) # creates img file
                 print("{} written!".format(self.new_img)) #terminal output to help us
-                self.img_counter += 1 # helps name imgs
                 rval = False
 
         vc.release() # stops capturing images
@@ -138,11 +137,12 @@ class Ticket():
 
     # cancles the creation of a ticket
     def cancle(self):
+        self.img_name = ""
+        self.new_img = ""
         self.ticket_name = ""
         self.description = ""
         print("No problem. Nothing was saved!")
 
-# Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
 def run():
     new_ticket = Ticket() # creates new ticket object
     Ticket.create(new_ticket) # lets user create a ticket!
