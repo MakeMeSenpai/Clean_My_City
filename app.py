@@ -1,8 +1,10 @@
+import os
+import numpy as np
 from cv2 import cv2
-from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-import os
+from flask import Flask, render_template, request, redirect, url_for
+
 
 app = Flask(__name__)
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
@@ -19,6 +21,7 @@ class Ticket():
         self.ticket_name = ""
         self.description = ""
         self.img_name = ""
+        self.new_img = ""
         self.img_counter = 0 # helps name our imgs
 
     # Creates a ticket
@@ -65,8 +68,8 @@ class Ticket():
     def read(self):
         img = cv2.imread(self.img_name) #Read Image
         cv2.imshow(self.ticket_name,img) #Display Image
-        cv2.waitKey(1000)
-        cv2.destroyAllWindows() #doesn't close due to cv2 bug
+        cv2.waitKey(5000)
+        cv2.destroyWindow(self.ticket_name)
         print(self.ticket_name)
         print(self.description)
 
@@ -77,14 +80,61 @@ class Ticket():
 
     # lets user update a ticket
     def update(self):
+        #creates new image
+        cv2.namedWindow(self.ticket_name) # names our camera window
+        vc = cv2.VideoCapture(0) #looks at first frame 
+
+        #detects if the camera is on or not
+        if vc.isOpened(): 
+            rval, frame = vc.read()  # Shows camera feed
+        else:
+            rval = False
+
+        while rval: # keeps camera on
+            cv2.imshow(self.ticket_name, frame) # shows camera feed
+            rval, frame = vc.read() # shows camera feed
+            frame = cv2.flip(frame,1) # inverts camera
+            key = cv2.waitKey(20) # sets keyboard commands later, but here it waits 20ms for each frame
+            if key == 27: # exit on ESC - this is an emergancy exit
+                break 
+            elif key%256 == 32: # SPACE pressed - takes a picture!
+                self.new_img = "pics/after_{}.png".format(self.img_counter) # writes file name, in pics path
+                cv2.imread(self.new_img,1) # shows us tour picture *sometimes late*
+                cv2.imwrite(self.new_img, frame) # creates img file
+                print("{} written!".format(self.new_img)) #terminal output to help us
+                self.img_counter += 1 # helps name imgs
+                rval = False
+
+        vc.release() # stops capturing images
+        cv2.destroyWindow(self.ticket_name) # destroys cv2 window
+
+        #combineds images thanks to https://answers.opencv.org/question/175912/how-to-display-multiple-images-in-one-window/
+        before = cv2.imread(self.img_name) #opens images
+        after = cv2.imread(self.new_img)
+
+        #thx https://www.tutorialkart.com/opencv/python/opencv-python-resize-image/ for the help
+        # before = cv2.resize(self.img_name,None,fx=0.5,fy=0.95) #resizes imgs 
+        # after = cv2.resize(self.new_img,None,fx=0.5,fy=0.95)
+
+        numpy_horizontal_concat = np.concatenate((before, after), axis=1) #sorts the row
+        cv2.imwrite(self.img_name, numpy_horizontal_concat)
+        cv2.imshow(self.ticket_name + " *Cleaned!*", numpy_horizontal_concat)
+
+        cv2.waitKey(5000)
+        cv2.destroyWindow(self.ticket_name)
+
+        #makes final changes
         self.ticket_name += " *Cleaned!*"
         self.description += " *Post Description*"
         self.description += input("Clean up description: ")
 
     # let the user delete a ticket
     def delete(self):
+        self.img_name = ""
+        self.new_img = ""
         self.ticket_name = ""
         self.description = ""
+        self.img_counter -= 1
 
     # cancles the creation of a ticket
     def cancle(self):
