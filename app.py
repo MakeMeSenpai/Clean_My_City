@@ -10,9 +10,9 @@ app = Flask(__name__)
 # Camera controls! Thanks Ryan Keys for the help and Stack Overflow. This function also runs our program
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
-    # 3. Create routes for different pages- @route home, polution page, cleaned page
-    # 4. Create a way for users to leave comments on tickets-class comment
-    # 5. Create a cleaner UI on all of your pages
+    # 1. Create a way for users to leave comments on tickets-class comment
+    # 2. Create a cleaner UI on all of your pages
+    # 3. Make it work with flask
 
 # Class for tickets
 @app.route('/home') # uselessly runs flask after quiting terminal commands! 
@@ -22,6 +22,7 @@ class Ticket():
         self.description = ""
         self.img_name = ""
         self.new_img = ""
+        self.imgs = []
         self.img_counter = 0 # helps name our imgs
 
     # Creates a ticket
@@ -55,6 +56,7 @@ class Ticket():
         cv2.destroyWindow(self.ticket_name) # destroys cv2 window
         self.ticket_name = input("Name of Ticket: ")
         self.description = input("Location and Description: ")
+        self.imgs.append(self.img_name)
 
         #access cancle method to determine if user wants to save or not
         while True:
@@ -117,12 +119,13 @@ class Ticket():
 
     # Read a ticket (the ability to view a ticket)
     def read(self):
-        img = cv2.imread(self.img_name) #Read Image
-        cv2.imshow(self.ticket_name,img) #Display Image
-        cv2.waitKey(5000)
-        cv2.destroyWindow(self.ticket_name)
-        print(self.ticket_name)
-        print(self.description)
+        for i in self.imgs:
+            img = cv2.imread(i) #Read Image
+            cv2.imshow(self.ticket_name,img) #Display Image
+            cv2.waitKey(5000)
+            cv2.destroyWindow(self.ticket_name)
+            print(self.ticket_name)
+            print(self.description)
 
     # lets user edit a ticket
     def edit(self):
@@ -146,23 +149,62 @@ class Ticket():
         self.description = ""
         print("No problem. Nothing was saved!")
 
+# class Comment(object):
+#     def __init__(self, object):
+#         self.comment = ""
+#         self.comments = []
+
+#     # create a comment
+#     def create(self):
+#         self.comment = input("Leave a comment: ")
+#         self.comments.append(self.comment)
+#         for i in self.comments:
+#             print(i)
+#         self.run()
+
+#     # deletes a ticket
+#     def delete(self):
+#         self.comments.remove(self.comment)
+#         self.run()
+
+#     #runs program else where with z
+#     def run(self):
+#         what = input("What would you like to do?(c, d, or q): ")
+#         while True:
+#             if what == 'c':
+#                 self.create()
+#             elif what == 'd':
+#                 self.delete()
+#             elif what == 'q':
+#                 for i in self.comments:
+#                     object.description += f" #Comment: {i}"
+#                 run()
+#                 return False
+#             else:
+#                 print("what? ")
+#                 return True
+
+
+#runs code
 @app.route('/')
 def run():
     new_ticket = Ticket() # creates new ticket object
-    Ticket.create(new_ticket) # lets user create a ticket!
     #Gives user other controls involving CRUD
     while True: 
-        opt = input("What would you like to do?(type c, r, e, u, d, or q): ")
+        opt = input("What would you like to do?(type c, r, e, u, d, or q): ") #add z for comments but can't figure out how to add comments to a separate object rn becuase I'm tired
         if opt == 'c':
-            Ticket.create(new_ticket)
+            new_ticket.create()
         elif opt == 'r':
-            Ticket.read(new_ticket)
+            new_ticket.read()
         elif opt == 'e':
-            Ticket.edit(new_ticket)
+            new_ticket.edit()
         elif opt == 'u':
-            Ticket.update(new_ticket)
+            new_ticket.update()
         elif opt == 'd':
-            Ticket.delete(new_ticket)
+            new_ticket.delete()
+        # elif opt == 'z':
+        #     new_comment = Comment(new_ticket)
+        #     new_comment.run()
         elif opt == 'q':
             return False
         else:
@@ -170,39 +212,14 @@ def run():
             
 run() #runs our program
 
-class Comment(object):
-    def __init__(self):
-        pass
-
-    # create a comment
-    def create(self):
-        pass
-
-    # deletes a ticket
-    def delete(self):
-        pass
-
-#TODO: Car
+#TODO: Car with stretch limo (stretch challenges)
     # Users will be able to message one another, send each other money, and join larger events. 
         # Final stages will include the ability to sign into their own accounts.
-    # 1. Make it so that people can post completed cleans next to before picture - more camera editing
-class after(object):
-    def __init__(self):
-        pass
+    # 1. User Authentification - do more research!!!!
+    # 2. Make it so that users can join larger events - make a reclickable button that toggles on/off
+    # 3. Make it so that users can message one another class private message
+    # 4. Make it so that users can send money to one another (with the ability to accept or decline)
+    # 5. Make events better preforming and donation option available - revert to 3 
+    # 6. Ship app to every app store
+    # 7. re-examine and clean up site/app based off user feedback
     
-    #takes ticket object and posts after picture next to area
-    def create(self):
-        pass
-
-    #lets users edit after posts
-    def edit(self):
-        pass
-    # 2. User Authentification - do more research!!!!
-    # 3. Make it so that users can join larger events - make a reclickable button that toggles on/off
-
-#TODO: Stretch Challenges and other
-    # 1. re-examine and clean up site/app based off user feedback
-    # 2. Make it so that users can message one another class private message
-    # 3. Make it so that users can send money to one another (with the ability to accept or decline)
-    # 4. Make events better preforming and donation option available - revert to 3 
-    # 5. Ship app to every app store
