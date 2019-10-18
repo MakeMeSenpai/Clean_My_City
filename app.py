@@ -11,8 +11,9 @@ app = Flask(__name__)
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
     # 1. Create a way for users to leave comments on tickets-class comment
-    # 2. Create a cleaner UI on all of your pages
-    # 3. Make it work with flask
+    # 2. Make it work with flask
+    # 3. Create a cleaner UI on all of your pages
+    
 
 # Class for tickets
 @app.route('/home') # uselessly runs flask after quiting terminal commands! 
