@@ -1,5 +1,4 @@
 from cv2 import cv2
-
     
 #TODO: Bike - Users will be able to switch between cleaned and pollution tabs in which they can leave 
         # comments
